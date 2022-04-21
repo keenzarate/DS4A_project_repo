@@ -1,2 +1,2 @@
-# ds4A_project_team_25
+# DS4A Project Repo
 Team repo for the ds4A data engineering fellowship 2022
