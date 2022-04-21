@@ -33,9 +33,10 @@ def clean_world_bank(countries:list, data_path):
     return sub_dt_final
 
 # clean cereal data
-cereal = clean_world_bank(countries, '/Users/keenzarate/Documents/data/ds4a/cereal.csv')
+cereal = clean_world_bank(countries, 'https://raw.githubusercontent.com/keenzarate/DS4A_project_repo/main/data/cereal.csv?token=GHSAT0AAAAAABTRESMJ372THZWUWIAFNEVCYTB5CQQ')
 
 # load c02 emissions data 
-carbon_emissions =  clean_world_bank(countries, '/Users/keenzarate/Documents/data/ds4a/co2_emissions.csv')
+carbon_emissions =  clean_world_bank(countries, 'https://raw.githubusercontent.com/keenzarate/DS4A_project_repo/main/data/co2_emissions.csv?token=GHSAT0AAAAAABTRESMIIVVGTWRNZGQETV5MYTB5C4Q')
 
-rainfall_dt = clean_world_bank(countries, '/Users/keenzarate/Documents/data/ds4a/precipitation.csv')
+# load and clean rainfall data
+rainfall_dt = clean_world_bank(countries, 'https://raw.githubusercontent.com/keenzarate/DS4A_project_repo/main/data/precipitation.csv?token=GHSAT0AAAAAABTRESMIPXCNRV4PDPQIA44YYTB5DFQ')
