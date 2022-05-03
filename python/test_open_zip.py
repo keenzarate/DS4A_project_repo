@@ -57,6 +57,8 @@ sub_data['filename']=sub_data['filename'].astype('string')
 # grab year so we can identify rows that belong to given year
 sub_data['year'] = sub_data['filename'].str.slice(17, 21)
 
+# subset one coordinate just to test the map thing
+test_sub = sub_data.loc[((sub_data['longitude'] == 78.75) & (sub_data['latitude'] == 20.75)) | ((sub_data['longitude'] == 104.25) & (sub_data['latitude'] == 35.25))]
 
 
 # plot coordinates on map 
@@ -65,12 +67,11 @@ countries = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 
 countries.plot(color="lightgrey")
 
-gdf_data = gpd.GeoDataFrame(sub_data, geometry=gpd.points_from_xy(sub_data.longitude, sub_data.latitude))
+gdf_data = gpd.GeoDataFrame(test_sub, geometry=gpd.points_from_xy(test_sub.longitude, test_sub.latitude))
 
-ax = countries.plot(color='white', edgecolor='black')
+ax = countries.plot(facecolor='Grey', edgecolor='k',alpha=1,linewidth=1)
 
-# We can now plot our ``GeoDataFrame``.
-gdf_data.plot(ax=ax, markersize = 2, color = 'red')
+gdf_data.plot(ax=ax, color = 'red', markersize = 10)
 
 plt.show()
 
