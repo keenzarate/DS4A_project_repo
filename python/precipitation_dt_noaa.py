@@ -8,11 +8,11 @@ import datetime
 
 pd.set_option('display.max_colwidth', None)
 
+# info: https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-monthly (also has temperature data)
 # data pulled from 'https://www.ncei.noaa.gov/data/ghcnm/v4beta/archive/'
 # documentation of this lives here; https://www.ncei.noaa.gov/data/ghcnm/v4beta/doc/ (readme and the inventory file)
 
 #documentation : https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-daily
-# temperature dt: https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-monthly
 # all other data: https://www.ncei.noaa.gov/data/
 
 
