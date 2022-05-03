@@ -11,6 +11,11 @@ import geopandas as gpd
 
 pd.set_option('display.max_colwidth', None)
 
+
+# data downloaded from: http://climate.geog.udel.edu/~climate/html_pages/download.html
+# Under "Terrestrial Precipitation: 1900-2017 Gridded Monthly Time Series (V 5.01)"
+# Terrestrial Monthly Precipitation series (precip_2017.tar.gz (284MB))
+
 folder = '/Users/keenzarate/Documents/data/ds4a/precip_2017.tar.gz'
 
 # create list of col names
@@ -48,20 +53,22 @@ stacked_dt = pd.concat(list_dt)
 # convert data long to make it easier to read
 stacked_dt_long = pd.melt(stacked_dt, id_vars = ['longitude', 'latitude', 'filename'], value_name = 'moisture_index')
 
-# subset data only annual values
-sub_data = stacked_dt_long.loc[stacked_dt_long['variable'].isin(['overall'])]
-
 # convert column to string so we can grab year -- this is so slow ..
-sub_data['filename']=sub_data['filename'].astype('string')
+stacked_dt_long['filename']=stacked_dt_long['filename'].astype('string')
 
 # grab year so we can identify rows that belong to given year
-sub_data['year'] = sub_data['filename'].str.slice(17, 21)
+stacked_dt_long['year'] = stacked_dt_long['filename'].str.slice(17, 21)
+
+# subset data only annual values
+sub_data = stacked_dt_long.loc[stacked_dt_long['variable'].isin(['overall'])]
 
 # subset one coordinate just to test the map thing
 test_sub = sub_data.loc[((sub_data['longitude'] == 78.75) & (sub_data['latitude'] == 20.75)) | ((sub_data['longitude'] == 104.25) & (sub_data['latitude'] == 35.25))]
 
+test_sub.sort_values(by=['longitude', 'latitude', 'year'])
 
-# plot coordinates on map 
+
+# # plot coordinates on map 
 
 countries = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 
