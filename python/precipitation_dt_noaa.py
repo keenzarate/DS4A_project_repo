@@ -74,10 +74,10 @@ india_sub = sub_stacked.loc[(sub_stacked['gcn_identifier'].str.contains('IN\d{9}
 india_sub.sort_values(by=['gcn_identifier', 'year'])
 
 # count the number of years by gcn identifier, ideally we want at least 10!
-num_years = india_sub.groupby(['gcn_identifier'])['year'].count().reset_index(name = 'counts')
+num_years = india_sub.groupby(['gcn_identifier'])['year'].nunique().reset_index(name = 'counts')
 
 # order by count
 num_years.sort_values(by = ['counts'])
 
 # look at the highest one -- looks like it's not really consistent by year.
-india_sub.loc[india_sub['gcn_identifier'] == 'IN009021100']
+india_sub.loc[india_sub['gcn_identifier'] == 'IN099999901']
