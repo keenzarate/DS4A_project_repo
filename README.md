@@ -14,7 +14,7 @@ In this section, we outline our general ideas for our pipeline.
 
 Proposed pipeline:
 
-<img width="497" alt="Screen Shot 2022-05-23 at 5 19 04 PM" src="https://user-images.githubusercontent.com/48080946/169914060-2b50c0b0-1440-4c7a-8b8f-01d441c42e8e.png">
+<p align="center"><img width="497" alt="Screen Shot 2022-05-23 at 5 19 04 PM" src="https://user-images.githubusercontent.com/48080946/169914060-2b50c0b0-1440-4c7a-8b8f-01d441c42e8e.png"></p>
 
 - Data Storage: 
   - We will be using AWS S3 as our main stroge for this project. We will create a folder inside our bucket for raw data and cleaned data. Our database will be PostgreSQL and hosted through an instance in AWS. 
