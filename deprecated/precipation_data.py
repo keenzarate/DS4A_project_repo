@@ -13,10 +13,10 @@ pd.set_option('display.max_colwidth', None)
 
 
 # data downloaded from: http://climate.geog.udel.edu/~climate/html_pages/download.html
-# Under "Terrestrial Precipitation: 1900-2017 Gridded Monthly Time Series (V 5.01)"
+# Under "http://climate.geog.udel.edu/~climate/html_pages/download.html"
 # Terrestrial Monthly Precipitation series (precip_2017.tar.gz (284MB))
 
-folder = '/Users/keenzarate/Documents/data/ds4a/precip_2017.tar.gz'
+folder = '/Users/keenzarate/Documents/data/ds4a/precipitation_climate_geo.tar.gz'
 
 # create list of col names
 col_names = ['longitude', 'latitude', 'jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'overall']

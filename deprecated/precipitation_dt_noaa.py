@@ -17,7 +17,7 @@ pd.set_option('display.max_colwidth', None)
 
 
 # let's load this version so it's compressed with all the files 
-folder = '/Users/keenzarate/Documents/data/ds4a/ghcn-m_v4.00.00_prcp_s16970101_e20220331_c20220407.tar.gz'
+folder = '/Users/keenzarate/Documents/data/ds4a/precipitation_noaa.tar.gz'
 
 
 years = datetime.datetime.today().year
@@ -38,7 +38,7 @@ for member in tar:
     # convert to str so we can search
     str_var = str(member)
 
-    if re.search('CH|BR|IN', str_var):
+    if re.search('CH|BR|IN|US', str_var):
         # extract the member
         content = tar.extractfile(member).read()
 
@@ -80,4 +80,4 @@ num_years = india_sub.groupby(['gcn_identifier'])['year'].nunique().reset_index(
 num_years.sort_values(by = ['counts'])
 
 # look at the highest one -- looks like it's not really consistent by year.
-india_sub.loc[india_sub['gcn_identifier'] == 'IN099999901']
+india_sub['precipitation_value'].loc[india_sub['gcn_identifier'] == 'IN099999901']

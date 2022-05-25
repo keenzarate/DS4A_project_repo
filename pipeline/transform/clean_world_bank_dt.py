@@ -32,6 +32,9 @@ def clean_world_bank(countries:list, data_path):
 
     return sub_dt_final
 
+
+#### change the data path to something else... pull from raw data in S3
+
 # clean cereal data
 cereal = clean_world_bank(countries, 'https://raw.githubusercontent.com/keenzarate/DS4A_project_repo/main/data/cereal.csv?token=GHSAT0AAAAAABTRESMJ372THZWUWIAFNEVCYTB5CQQ')
 
