@@ -1,11 +1,10 @@
 import pandas as pd
 import io
 import tarfile
-import os
+import boto3
 import re
 from tabulate import tabulate
 import matplotlib.pyplot as plt
-import fiona
 import geopandas as gpd
 
 
@@ -15,6 +14,7 @@ pd.set_option('display.max_colwidth', None)
 # data downloaded from: http://climate.geog.udel.edu/~climate/html_pages/download.html
 # Under "http://climate.geog.udel.edu/~climate/html_pages/download.html"
 # Terrestrial Monthly Precipitation series (precip_2017.tar.gz (284MB))
+
 
 folder = '/Users/keenzarate/Documents/data/ds4a/precipitation_climate_geo.tar.gz'
 

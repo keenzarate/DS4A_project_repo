@@ -62,23 +62,23 @@ stacked_dt_long['year'] = stacked_dt_long['filename'].str.slice(17, 21)
 # subset data only annual values
 sub_data = stacked_dt_long.loc[stacked_dt_long['variable'].isin(['overall'])]
 
-# subset one coordinate just to test the map thing
-test_sub = sub_data.loc[((sub_data['longitude'] == 78.75) & (sub_data['latitude'] == 20.75)) | ((sub_data['longitude'] == 104.25) & (sub_data['latitude'] == 35.25))]
+# # subset one coordinate just to test the map thing
+# test_sub = sub_data.loc[((sub_data['longitude'] == 78.75) & (sub_data['latitude'] == 20.75)) | ((sub_data['longitude'] == 104.25) & (sub_data['latitude'] == 35.25))]
 
-test_sub.sort_values(by=['longitude', 'latitude', 'year'])
+# test_sub.sort_values(by=['longitude', 'latitude', 'year'])
 
 
 # # plot coordinates on map 
 
-countries = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+# countries = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 
-countries.plot(color="lightgrey")
+# countries.plot(color="lightgrey")
 
-gdf_data = gpd.GeoDataFrame(test_sub, geometry=gpd.points_from_xy(test_sub.longitude, test_sub.latitude))
+# gdf_data = gpd.GeoDataFrame(test_sub, geometry=gpd.points_from_xy(test_sub.longitude, test_sub.latitude))
 
-ax = countries.plot(facecolor='Grey', edgecolor='k',alpha=1,linewidth=1)
+# ax = countries.plot(facecolor='Grey', edgecolor='k',alpha=1,linewidth=1)
 
-gdf_data.plot(ax=ax, color = 'red', markersize = 10)
+# gdf_data.plot(ax=ax, color = 'red', markersize = 10)
 
-plt.show()
+# plt.show()
 
