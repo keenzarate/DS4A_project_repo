@@ -76,6 +76,9 @@ carbon_emissions =  clean_world_bank(countries, '/Users/keenzarate/Documents/dat
 carbon_emissions.sort_index(axis = 1)
 
 
+# testing
+
+
 
 # add precipitation data here:
 
