@@ -94,7 +94,7 @@ temp_chn = "/Users/keenzarate/Documents/data/ds4a/tas_timeseries_annual_cru_1901
 temp_ind = "/Users/keenzarate/Documents/data/ds4a/tas_timeseries_annual_cru_1901-2020_IND.csv"
 
 # clean mean temperature data 
-clean_mean_temp = clean_temp_precip(temp_usa, temp_usa, temp_usa, temp_usa, 'mean_temperature_tons')
+clean_mean_temp = clean_temp_precip(temp_usa, temp_bra, temp_chn, temp_ind, 'mean_temperature_tons')
 
 #################################
 ### CLEAN PRECIPITATION DATA ###
