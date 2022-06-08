@@ -168,8 +168,8 @@ final_cereal_data = cereal.pivot(index=['location', 'year'], columns='measure_na
 ###   WRITE DATA TO CSV  ###
 #############################
 
-final_cereal_data.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_cereal_data.csv')
-final_weather_data.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_weather_data.csv')
+final_cereal_data.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_cereal_data.csv',   index = False)
+final_weather_data.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_weather_data.csv', index = False)
 
 # data 
 cereal_data = '/Users/keenzarate/Documents/data/ds4a/clean_cereal_data.csv'
