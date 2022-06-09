@@ -1,28 +1,10 @@
 -- create schemas 
---create schema raw_data 
---create schema dev_wh
-
-
-
---  drops 
-drop table raw_data.cereal_data cascade; 
-drop table raw_data.climate_indicator cascade; 
-drop table raw_data.greenhouse_gas cascade; 
-drop table raw_data.world_cities cascade;
-drop table dev_wh.dim_element cascade;
-drop table dev_wh.dim_country cascade;
-drop table dev_wh.dim_cereals cascade;
-drop table dev_wh.dim_time cascade;
-drop table dev_wh.int_climate_indicator cascade; 
-drop table dev_wh.int_greenhouse_gas  cascade;
-drop table dev_wh.dim_climate_gas cascade;
-drop table dev_wh.int_fact_cereal_agg;
-drop table dev_wh.int_fact_climate_agg;
-drop table dev_wh.fact_cereal_and_climate;
+create schema clean_data;
+create schema prod_wh;
 
 
 -- create tables for RAW schema
-create table raw_data.cereal_data(
+create table clean_data.cereal_data(
 	country_id varchar, 
 	country varchar, 
 	element_code varchar, 
@@ -34,9 +16,7 @@ create table raw_data.cereal_data(
 	value numeric
 );
 
-
-
-create table raw_data.greenhouse_gas (
+create table clean_data.greenhouse_gas (
 	 country varchar,             
 	 sector  varchar,
 	 gas     varchar,
@@ -45,8 +25,7 @@ create table raw_data.greenhouse_gas (
 	 measure_value numeric
 );
 
-
-create table raw_data.climate_indicator (
+create table clean_data.climate_indicator (
 	year varchar,      
 	country  varchar,  
 	location varchar, 
@@ -56,24 +35,40 @@ create table raw_data.climate_indicator (
 );
 
 
-
-create table raw_data.world_cities(
+create table clean_data.world_cities(
 	country varchar, 
 	number_of_cities numeric,
 	total_population numeric	
 );
 
 
+-- Update S3 URI and aws key and secret key
+copy into clean_data.cereal_data
+from S3 URI 
+credentials=(aws_key_id='' aws_secret_key='')
+FILE_FORMAT = (TYPE = 'csv') ON_ERROR = 'CONTINUE';
 
-copy raw_data.cereal_data FROM '/Users/keenzarate/Documents/data/ds4a/clean_data/clean_cereal_data.csv' DELIMITER ',' csv header;
-copy raw_data.climate_indicator FROM '/Users/keenzarate/Documents/data/ds4a/clean_data/clean_climate_indicator_data.csv' DELIMITER ',' csv header;
-copy raw_data.greenhouse_gas FROM '/Users/keenzarate/Documents/data/ds4a/clean_data/clean_greenhouse_data.csv' DELIMITER ',' csv header;
-copy raw_data.world_cities FROM '/Users/keenzarate/Documents/data/ds4a/clean_data/clean_country_info.csv' DELIMITER ',' csv header;
 
+copy into clean_data.climate_indicator
+from S3 URI 
+credentials=(aws_key_id='' aws_secret_key='')
+FILE_FORMAT = (TYPE = 'csv') ON_ERROR = 'CONTINUE';
+
+
+copy into clean_data.world_cities
+from S3 URI
+credentials=(aws_key_id='' aws_secret_key='')
+FILE_FORMAT = (TYPE = 'csv') ON_ERROR = 'CONTINUE';
+
+
+copy into clean_data.greenhouse_gas
+from S3 URI
+credentials=(aws_key_id='' aws_secret_key='')
+FILE_FORMAT = (TYPE = 'csv') ON_ERROR = 'CONTINUE';
 
 
 -- create DIMENSION TABLES 
-create table dev_wh.dim_element(
+create table prod_wh.dim_element(
 	element_id varchar primary key,
 	element_name varchar,
 	unit varchar,
@@ -82,7 +77,7 @@ create table dev_wh.dim_element(
 
 
 
-create table dev_wh.dim_country (
+create table prod_wh.dim_country (
   country_id varchar primary key,
   country_name varchar,
   number_of_cities numeric, 
@@ -90,18 +85,18 @@ create table dev_wh.dim_country (
 );
 
 
-create table dev_wh.dim_cereals (
+create table prod_wh.dim_cereals (
   cereal_id varchar primary key,
   cereal_name varchar
 );
 
-create table dev_wh.dim_time(
+create table prod_wh.dim_time(
   time_id varchar primary key,
   data_year varchar
 );
 
 
-create table dev_wh.int_climate_indicator(
+create table prod_wh.int_climate_indicator(
   indicator_id varchar primary key,
   indicator_name varchar,
   indicator_abbrev varchar,
@@ -110,7 +105,7 @@ create table dev_wh.int_climate_indicator(
 );
 
 
-create table dev_wh.int_greenhouse_gas(
+create table prod_wh.int_greenhouse_gas(
   indicator_id varchar primary key,
   indicator_name varchar,
   indicator_abbrev varchar,
@@ -120,7 +115,7 @@ create table dev_wh.int_greenhouse_gas(
 );
 
 
-create table dev_wh.dim_climate_gas  (
+create table prod_wh.dim_climate_gas  (
 	indicator_id varchar primary key,
     indicator_name varchar,
     indicator_abbrev varchar,
@@ -129,35 +124,35 @@ create table dev_wh.dim_climate_gas  (
    
    
 
-create table dev_wh.int_fact_cereal_agg (
+create table prod_wh.int_fact_cereal_agg (
   country_id  varchar,
   time_id     varchar,
   element_id  varchar,
   cereal_id   varchar,
   cereal_measure_value integer,
-  FOREIGN key (country_id) REFERENCES dev_wh.dim_country(country_id),
-  FOREIGN key (time_id) REFERENCES dev_wh.dim_time(time_id),
-  FOREIGN key (element_id) REFERENCES dev_wh.dim_element(element_id),
-  FOREIGN key (cereal_id) REFERENCES dev_wh.dim_cereals(cereal_id)
+  FOREIGN key (country_id) REFERENCES prod_wh.dim_country(country_id),
+  FOREIGN key (time_id) REFERENCES prod_wh.dim_time(time_id),
+  FOREIGN key (element_id) REFERENCES prod_wh.dim_element(element_id),
+  FOREIGN key (cereal_id) REFERENCES prod_wh.dim_cereals(cereal_id)
   
 );
 
 
 
-create table dev_wh.int_fact_climate_agg (
+create table prod_wh.int_fact_climate_agg (
   country_id  varchar,
   time_id     varchar,
   indicator_id varchar,
   climate_gas_indicator_value numeric,
-  FOREIGN key (country_id) REFERENCES dev_wh.dim_country(country_id),
-  FOREIGN key (time_id) REFERENCES dev_wh.dim_time(time_id),
-  FOREIGN key (indicator_id) REFERENCES dev_wh.dim_climate_gas(indicator_id));
+  FOREIGN key (country_id) REFERENCES prod_wh.dim_country(country_id),
+  FOREIGN key (time_id) REFERENCES prod_wh.dim_time(time_id),
+  FOREIGN key (indicator_id) REFERENCES prod_wh.dim_climate_gas(indicator_id));
 
 
  
  
  /* insert values into the dimension and fact tables */
-insert into dev_wh.dim_element (select 
+insert into prod_wh.dim_element (select 
  	distinct
  	md5(element), 
  	element, 
@@ -167,26 +162,26 @@ insert into dev_wh.dim_element (select
  		when unit = 'tonnes' then 'tonnes'
  		when unit = 'ha' then 'hectar'
  	end as unit_descr
-   from raw_data.cereal_data);
+   from clean_data.cereal_data);
 
 
 
-insert into dev_wh.dim_country (
+insert into prod_wh.dim_country (
 with dt_country as (
 select 
  	distinct 
  	country
- from raw_data.climate_indicator
+ from clean_data.climate_indicator
  union all 
  select 
 	distinct 
     country
- from raw_data.greenhouse_gas
+ from clean_data.greenhouse_gas
  union all 
  select 
 	distinct 
     country
- from raw_data.cereal_data
+ from clean_data.cereal_data
 )
 select distinct 
       md5(dt.country), 
@@ -194,33 +189,33 @@ select distinct
       number_of_cities, 
       total_population
 from dt_country dt
-left join raw_data.world_cities wc on dt.country = wc.country );
+left join clean_data.world_cities wc on dt.country = wc.country );
 
 
-insert into dev_wh.dim_cereals (
+insert into prod_wh.dim_cereals (
 select 
  	distinct
  	md5(item), 
  	item
-   from raw_data.cereal_data);
+   from clean_data.cereal_data);
 
 
-insert into dev_wh.dim_time (
+insert into prod_wh.dim_time (
 with dt_year as 
 (select 
  	distinct 
  	year
- from raw_data.climate_indicator
+ from clean_data.climate_indicator
  union all 
  select 
 	distinct 
     year
- from raw_data.greenhouse_gas
+ from clean_data.greenhouse_gas
  union all 
  select 
 	distinct 
     year
- from raw_data.cereal_data
+ from clean_data.cereal_data
 )
 select distinct 
       md5(year), 
@@ -229,7 +224,7 @@ from dt_year
 order by year);
 
 
-insert into dev_wh.int_climate_indicator (
+insert into prod_wh.int_climate_indicator (
 select 
  	distinct
  	md5(measure_name), 
@@ -243,10 +238,10 @@ select
  		when unit = 'Tonnes' then 'tons'
  	end as unit,
  	unit
-   from raw_data.climate_indicator);
+   from clean_data.climate_indicator);
 
   
-insert into dev_wh.int_greenhouse_gas (
+insert into prod_wh.int_greenhouse_gas (
 	select 
 		distinct 
 		md5(gas), 
@@ -260,22 +255,22 @@ insert into dev_wh.int_greenhouse_gas (
 		case 
 	 		when unit = 'MtCO₂e' then 'Metric tons of carbon dioxide equivalent'
  		end as unit
-    from raw_data.greenhouse_gas gg 
+    from clean_data.greenhouse_gas gg 
 );
 
 
 
-insert into dev_wh.dim_climate_gas (
+insert into prod_wh.dim_climate_gas (
 	select *
-	from dev_wh.int_climate_indicator ici 
+	from prod_wh.int_climate_indicator ici 
 	union all 
 	select *
-	from dev_wh.int_greenhouse_gas igg 
+	from prod_wh.int_greenhouse_gas igg 
 
 );
 
 
-insert into dev_wh.int_fact_cereal_agg (
+insert into prod_wh.int_fact_cereal_agg (
 	select 
 		distinct 
 		dc2.country_id, 
@@ -283,25 +278,25 @@ insert into dev_wh.int_fact_cereal_agg (
 		de.element_id, 
 		dc.cereal_id, 
 		value
-	from raw_data.cereal_data cd 
-	left join dev_wh.dim_cereals dc on cd.item = dc.cereal_name
-	left join dev_wh.dim_country dc2 on cd.country = dc2.country_name
-	left join dev_wh.dim_time dt on cd.year = dt.data_year 
-	left join dev_wh.dim_element de on cd.element = de.element_name );
+	from clean_data.cereal_data cd 
+	left join prod_wh.dim_cereals dc on cd.item = dc.cereal_name
+	left join prod_wh.dim_country dc2 on cd.country = dc2.country_name
+	left join prod_wh.dim_time dt on cd.year = dt.data_year 
+	left join prod_wh.dim_element de on cd.element = de.element_name );
 	
 
 
-insert into dev_wh.int_fact_climate_agg (
+insert into prod_wh.int_fact_climate_agg (
 	with gas_greenhouse as (select 
 		distinct 
 		dc2.country_id, 
 		dt.time_id, 
 		de.indicator_id, 
 		measure_value
-	from raw_data.greenhouse_gas cd 
-	left join dev_wh.dim_country dc2 on cd.country = dc2.country_name
-	left join dev_wh.dim_time dt on cd.year = dt.data_year 
-	left join dev_wh.dim_climate_gas de on cd.gas = de.indicator_abbrev 
+	from clean_data.greenhouse_gas cd 
+	left join prod_wh.dim_country dc2 on cd.country = dc2.country_name
+	left join prod_wh.dim_time dt on cd.year = dt.data_year 
+	left join prod_wh.dim_climate_gas de on cd.gas = de.indicator_abbrev 
     ),
     climate_ind as (
     select 
@@ -310,10 +305,10 @@ insert into dev_wh.int_fact_climate_agg (
 		dt.time_id, 
 		dcii.indicator_id, 
 		measure_value
-	from raw_data.climate_indicator cd 
-	left join dev_wh.dim_country dc2 on cd.country = dc2.country_name
-	left join dev_wh.dim_time dt on cd.year = dt.data_year 
-	left join dev_wh.dim_climate_gas dcii on cd.measure_name = dcii.indicator_name
+	from clean_data.climate_indicator cd 
+	left join prod_wh.dim_country dc2 on cd.country = dc2.country_name
+	left join prod_wh.dim_time dt on cd.year = dt.data_year 
+	left join prod_wh.dim_climate_gas dcii on cd.measure_name = dcii.indicator_name
 	where country = location)
 	select * 
     from gas_greenhouse
@@ -323,7 +318,7 @@ insert into dev_wh.int_fact_climate_agg (
 
   
    --- create a view table 
-   create table dev_wh.fact_cereal_and_climate (
+   create table prod_wh.fact_cereal_and_climate (
     country_id  varchar,
      time_id     varchar,
      indicator_id varchar,
@@ -331,11 +326,11 @@ insert into dev_wh.int_fact_climate_agg (
      cereal_id   varchar,
      cereal_measure_value integer,
      climate_gas_indicator_value numeric,
-  FOREIGN key (country_id) REFERENCES dev_wh.dim_country(country_id),
-  FOREIGN key (time_id) REFERENCES dev_wh.dim_time(time_id),
-  FOREIGN key (indicator_id) REFERENCES dev_wh.dim_climate_gas(indicator_id),
-  FOREIGN key (element_id) REFERENCES dev_wh.dim_element(element_id),
-  FOREIGN key (cereal_id) REFERENCES dev_wh.dim_cereals(cereal_id));
+  FOREIGN key (country_id) REFERENCES prod_wh.dim_country(country_id),
+  FOREIGN key (time_id) REFERENCES prod_wh.dim_time(time_id),
+  FOREIGN key (indicator_id) REFERENCES prod_wh.dim_climate_gas(indicator_id),
+  FOREIGN key (element_id) REFERENCES prod_wh.dim_element(element_id),
+  FOREIGN key (cereal_id) REFERENCES prod_wh.dim_cereals(cereal_id));
 
 
   
@@ -343,7 +338,7 @@ insert into dev_wh.int_fact_climate_agg (
   
   
 
-  insert into dev_wh.fact_cereal_and_climate (select distinct 
+  insert into prod_wh.fact_cereal_and_climate (select distinct 
           fca.country_id, 
    		  fca.time_id, 
    		  indicator_id, 
@@ -351,17 +346,37 @@ insert into dev_wh.int_fact_climate_agg (
    		  cereal_id,
    		  cereal_measure_value, 
    		  climate_gas_indicator_value
-   from dev_wh.int_fact_cereal_agg fca 
-   left join dev_wh.int_fact_climate_agg fca2 on fca.country_id = fca2.country_id 
+   from prod_wh.int_fact_cereal_agg fca 
+   left join prod_wh.int_fact_climate_agg fca2 on fca.country_id = fca2.country_id 
    										  and fca.time_id   = fca2.time_id);
    										  
    					
-   										 
+
+
+--  drops -- run only if we need to delete and redo everything
+-- drop table clean_data.cereal_data cascade; 
+-- drop table clean_data.climate_indicator cascade; 
+-- drop table clean_data.greenhouse_gas cascade; 
+-- drop table clean_data.world_cities cascade;
+-- drop table prod_wh.dim_element cascade;
+-- drop table prod_wh.dim_country cascade;
+-- drop table prod_wh.dim_cereals cascade;
+-- drop table prod_wh.dim_time cascade;
+-- drop table prod_wh.int_climate_indicator cascade; 
+-- drop table prod_wh.int_greenhouse_gas  cascade;
+-- drop table prod_wh.dim_climate_gas cascade;
+-- drop table prod_wh.int_fact_cereal_agg;
+-- drop table prod_wh.int_fact_climate_agg;
+-- drop table prod_wh.fact_cereal_and_climate;
+
+
+
+-- to test 
  select * 
- from dev_wh.fact_cereaL_and_climate fca
- left join dev_wh.dim_element de using(element_id)
- left join dev_wh.dim_climate_gas dcg using(indicator_id)
- left join dev_wh.dim_time using(time_id)
+ from prod_wh.fact_cereaL_and_climate fca
+ left join prod_wh.dim_element de using(element_id)
+ left join prod_wh.dim_climate_gas dcg using(indicator_id)
+ left join prod_wh.dim_time using(time_id)
  where fca.time_id = '84ddfb34126fc3a48ee38d7044e87276' and element_id = '756d97bb256b8580d4d71ee0c547804e' 
 and cereal_id = 'a4b4e5b1b17e841ac1842fc69762210a' and fca.country_id = '42537f0fb56e31e20ab9c2305752087d'
  
@@ -374,10 +389,10 @@ and cereal_id = 'a4b4e5b1b17e841ac1842fc69762210a' and fca.country_id = '42537f0
 --		dcii.indicator_id, 
 --		dcii.indicator_name,
 --		measure_value
---	from raw_data.climate_indicator cd 
---	left join dev_wh.dim_country dc2 on cd.country = dc2.country_name
---	left join dev_wh.dim_time dt on cd.year = dt.data_year 
---	left join dev_wh.dim_climate_gas dcii on cd.measure_name = dcii.indicator_name
+--	from clean_data.climate_indicator cd 
+--	left join prod_wh.dim_country dc2 on cd.country = dc2.country_name
+--	left join prod_wh.dim_time dt on cd.year = dt.data_year 
+--	left join prod_wh.dim_climate_gas dcii on cd.measure_name = dcii.indicator_name
 --where time_id = '84ddfb34126fc3a48ee38d7044e87276' and indicator_id = '2f166cf2c3416ffe6f398937e5c6157a' and country_id = '42537f0fb56e31e20ab9c2305752087d'
 --	
 --
@@ -385,11 +400,11 @@ and cereal_id = 'a4b4e5b1b17e841ac1842fc69762210a' and fca.country_id = '42537f0
 
 --
 --select * 
---from dev_wh.dim_country dc 
+--from prod_wh.dim_country dc 
 --where country_id = '42537f0fb56e31e20ab9c2305752087d'
 --
 --select *
---from raw_data.climate_indicator ci 
+--from clean_data.climate_indicator ci 
 --where location = 'Brazil' and measure_name = 'Precipitation'
 --order by 1
 
