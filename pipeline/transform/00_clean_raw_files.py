@@ -1,10 +1,11 @@
-from re import S
 import pandas as pd
+import boto3
 
 #######################
 ## world cities data ##
 ########################
 
+# read dataset
 world_cities = pd.read_csv("/Users/keenzarate/Documents/data/ds4a/new_raw_data/worldcities.csv")
 
 # subset data to only countries we want 
@@ -13,14 +14,17 @@ sub_world_cities = world_cities[world_cities['country'].isin(['China', 'India','
 # aggregate -- count number 
 ven = sub_world_cities.groupby(['country'])['city'].nunique().reset_index(name='number_of_cities')
 
+# calculate total population
 sum_pop = sub_world_cities.groupby(['country'])['population'].sum().reset_index(name='total_population')
 
+# merge the two dataframes
 country_info = pd.merge(ven, sum_pop, on = 'country')
 
 ######################
 ### cereal data    ###
 ######################
 
+# read cereal dt
 raw_cereal = pd.read_csv("/Users/keenzarate/Documents/data/ds4a/new_raw_data/cereal_new.csv")
 
 # clean up column 
@@ -43,6 +47,7 @@ final_cereal_data = sub_raw_cereal.rename({'area_code_(fao)': 'country_id', 'are
 # read dataset
 greenhouse_gas = pd.read_csv("/Users/keenzarate/Documents/data/ds4a/new_raw_data/historical_emissions.csv")
 
+# update column names 
 greenhouse_gas.columns = greenhouse_gas.columns.str.replace(' ','_')
 greenhouse_gas.columns = greenhouse_gas.columns.str.lower()
 
@@ -138,3 +143,48 @@ final_cereal_data.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_data/clean
 final_temp_precip.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_data/clean_climate_indicator_data.csv', index = False)
 final_greenhouse_gas.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_data/clean_greenhouse_data.csv', index = False)
 country_info.to_csv('/Users/keenzarate/Documents/data/ds4a/clean_data/clean_country_info.csv', index = False)
+
+
+# data 
+final_cereal_data = '/Users/keenzarate/Documents/data/ds4a/clean_cereal_data.csv'
+final_temp_precip = '/Users/keenzarate/Documents/data/ds4a/clean_climate_indicator_data.csv'
+final_greenhouse_gas = '/Users/keenzarate/Documents/data/ds4a/clean_greenhouse_data.csv'
+country_info = '/Users/keenzarate/Documents/data/ds4a/clean_country_info.csv'
+
+
+#############################
+###   LOAD DATA TO S3     ###
+#############################
+
+# create a client to access resources with
+s3_client = boto3.client('s3', aws_access_key_id = "null", aws_secret_access_key = "null")
+
+# upload the applications to the bucket created earlier
+# we have a try/except clause to see if it fails
+try:
+    s3_client.upload_file(final_cereal_data, 'null' ,"clean/clean_cereal_data.csv")
+    print('File successfully loaded')
+except Exception as e:
+    print(f'{e} Client error: file could not be uploaded to S3')
+
+# load weather data to s3
+try:
+    s3_client.upload_file(final_greenhouse_gas, 'null' ,"clean/clean_weather_data.csv")
+    print('File successfully loaded')
+except Exception as e:
+    print(f'{e} Client error: file could not be uploaded to S3')
+
+
+# load weather data to s3
+try:
+    s3_client.upload_file(final_temp_precip, 'null' ,"clean/clean_weather_data.csv")
+    print('File successfully loaded')
+except Exception as e:
+    print(f'{e} Client error: file could not be uploaded to S3')
+
+# load weather data to s3
+try:
+    s3_client.upload_file(country_info, 'null' ,"clean/clean_weather_data.csv")
+    print('File successfully loaded')
+except Exception as e:
+    print(f'{e} Client error: file could not be uploaded to S3')
