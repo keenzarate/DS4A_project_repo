@@ -3,7 +3,7 @@ create schema clean_data;
 create schema prod_wh;
 
 
--- create tables for RAW schema
+-- create tables to store clean data CEREAL
 create table clean_data.cereal_data(
 	country_id varchar, 
 	country varchar, 
@@ -16,6 +16,7 @@ create table clean_data.cereal_data(
 	value numeric
 );
 
+-- create tables to store clean data greenhouse gas
 create table clean_data.greenhouse_gas (
 	 country varchar,             
 	 sector  varchar,
@@ -25,6 +26,7 @@ create table clean_data.greenhouse_gas (
 	 measure_value numeric
 );
 
+-- create tables to store clean data climate indicator
 create table clean_data.climate_indicator (
 	year varchar,      
 	country  varchar,  
@@ -34,7 +36,7 @@ create table clean_data.climate_indicator (
 	unit varchar
 );
 
-
+-- create tables to store clean data world_cities
 create table clean_data.world_cities(
 	country varchar, 
 	number_of_cities numeric,
@@ -67,14 +69,13 @@ credentials=(aws_key_id='' aws_secret_key='')
 FILE_FORMAT = (TYPE = 'csv') ON_ERROR = 'CONTINUE';
 
 
--- create DIMENSION TABLES 
+-- BUILD ALL DIMENSION TABLES 
 create table prod_wh.dim_element(
 	element_id varchar primary key,
 	element_name varchar,
 	unit varchar,
 	unit_descr varchar
 );
-
 
 
 create table prod_wh.dim_country (
@@ -152,6 +153,7 @@ create table prod_wh.int_fact_climate_agg (
  
  
  /* insert values into the dimension and fact tables */
+
 insert into prod_wh.dim_element (select 
  	distinct
  	md5(element), 
@@ -333,11 +335,7 @@ insert into prod_wh.int_fact_climate_agg (
   FOREIGN key (cereal_id) REFERENCES prod_wh.dim_cereals(cereal_id));
 
 
-  
-  
-  
-  
-
+  -- insert data in fact table 
   insert into prod_wh.fact_cereal_and_climate (select distinct 
           fca.country_id, 
    		  fca.time_id, 
@@ -370,7 +368,6 @@ insert into prod_wh.int_fact_climate_agg (
 -- drop table prod_wh.fact_cereal_and_climate;
 
 
-
 -- to test 
  select * 
  from prod_wh.fact_cereaL_and_climate fca
@@ -380,33 +377,4 @@ insert into prod_wh.int_fact_climate_agg (
  where fca.time_id = '84ddfb34126fc3a48ee38d7044e87276' and element_id = '756d97bb256b8580d4d71ee0c547804e' 
 and cereal_id = 'a4b4e5b1b17e841ac1842fc69762210a' and fca.country_id = '42537f0fb56e31e20ab9c2305752087d'
  
-
-
--- select 
---		distinct 
---		dc2.country_id, 
---		dt.time_id, 
---		dcii.indicator_id, 
---		dcii.indicator_name,
---		measure_value
---	from clean_data.climate_indicator cd 
---	left join prod_wh.dim_country dc2 on cd.country = dc2.country_name
---	left join prod_wh.dim_time dt on cd.year = dt.data_year 
---	left join prod_wh.dim_climate_gas dcii on cd.measure_name = dcii.indicator_name
---where time_id = '84ddfb34126fc3a48ee38d7044e87276' and indicator_id = '2f166cf2c3416ffe6f398937e5c6157a' and country_id = '42537f0fb56e31e20ab9c2305752087d'
---	
---
-
-
---
---select * 
---from prod_wh.dim_country dc 
---where country_id = '42537f0fb56e31e20ab9c2305752087d'
---
---select *
---from clean_data.climate_indicator ci 
---where location = 'Brazil' and measure_name = 'Precipitation'
---order by 1
-
-   
    
